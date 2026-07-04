@@ -1,0 +1,7 @@
+{
+  // Point the integrated terminal's gh at the repo-local config so bare `gh`
+  // always runs as the premek-openedge account (not the global default).
+  "terminal.integrated.env.linux": {
+    "GH_CONFIG_DIR": "${workspaceFolder}/.ghconfig"
+  }
+}
