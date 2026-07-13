@@ -31,6 +31,7 @@
   var gNeedle = document.getElementById("gaugeNeedle");
   var gArc = document.getElementById("gaugeArc");
   var gChrome = document.getElementById("gaugeChrome"); // odometer box + caption
+  var heroSub = document.querySelector(".hero__sub"); // gauge centres vertically on this line
 
   var METER_MAX = 486203;      // "units metered" at the bottom of the page
   var ODO_START = 27056;       // odometer reading at the top of the page
@@ -49,6 +50,8 @@
   function lerp(a, b, t) { return a + (b - a) * t; }
   function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
   function smooth(t) { return t * t * (3 - 2 * t); } // smoothstep
+  // absolute document Y of an element's vertical centre (transform/scroll-independent)
+  function absCenterY(el) { var y = 0; for (var n = el; n; n = n.offsetParent) { y += n.offsetTop; } return y + el.offsetHeight / 2; }
 
   // num  = readout font-size (px); numTop = readout centre as a fraction of the
   // dial height (≈0.64 sits inside the odometer box; ≥1 sits just below the dial)
@@ -67,7 +70,9 @@
       // anchor the gauge to the content column's right edge (max-width 1280),
       // not the viewport edge — otherwise it drifts far right on wide screens
       var rightInset = Math.max(48, (vw - 1280) / 2 + 40);
-      HERO = { top: (vh - gw) / 2 + Math.min(16, vh * 0.02), right: rightInset, w: gw, num: 18, numTop: 0.64 };
+      // centre the dial on the hero subtitle line (fallback: viewport centre)
+      var heroTop = heroSub ? absCenterY(heroSub) - gw / 2 : (vh - gw) / 2 + Math.min(16, vh * 0.02);
+      HERO = { top: heroTop, right: rightInset, w: gw, num: 18, numTop: 0.64 };
       CORNER = { top: 74, right: 24, w: 98, num: 13, numTop: 1.12 };
       DOCK = vh * 0.72;
     }
