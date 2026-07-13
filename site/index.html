@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Edge — Reinventing the ISP</title>
+  <meta name="description" content="From connectivity to clearing, data and distribution — the story of how the Edge Settlement Protocol (ESP) reinvents the Internet Service Provider as the center of the open Internet." />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Open Edge — Reinventing the ISP" />
+  <meta property="og:description" content="The story of the ISP's next act: connectivity, clearing, data, distribution, endgame." />
+  <script>
+    /* set theme before paint to avoid flash */
+    (function () {
+      try {
+        var t = localStorage.getItem("oe-theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/styles.css?v=14" />
+</head>
+<body>
+  <a class="skip-link" href="#now">Skip to content</a>
+
+  <!-- ============================ NAV ============================ -->
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top" aria-label="Open Edge home"><b>Open</b><span class="brand__dim">Edge</span></a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#now">Now</a>
+        <a href="#clearing">Clearing</a>
+        <a href="#data">Data</a>
+        <a href="#distribution">Distribution</a>
+        <a href="#endgame">Endgame</a>
+        <a href="#whitepaper">Whitepaper</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke-linejoin="round"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================ METERING GAUGE ============================ -->
+  <!-- Fixed, scroll-driven: starts large in the hero, docks to the top-right
+       corner and its metered value climbs as you scroll. Positioned & animated
+       by main.js. Purely decorative (aria-hidden), degrades to a static dial. -->
+  <aside class="gauge" id="gauge" aria-hidden="true">
+    <div class="gauge__dial">
+      <svg viewBox="0 0 520 520">
+        <!-- dotted concentric rings -->
+        <circle cx="260" cy="260" r="236" fill="none" class="ha-faint" stroke-width="1.2" stroke-dasharray="1.4 11" opacity=".55"/>
+        <circle cx="260" cy="260" r="204" fill="none" class="ha-faint" stroke-width="1.2" stroke-dasharray="1.4 9" opacity=".8"/>
+        <circle cx="260" cy="260" r="150" fill="none" class="ha-rule" stroke-width="1.2"/>
+        <!-- gauge track + progress arc (same geometry; progress revealed by JS) -->
+        <path id="gaugeTrack" d="M154 366 A150 150 0 1 1 366 366" fill="none" class="gauge-track" stroke-width="2.2"/>
+        <path id="gaugeArc" d="M154 366 A150 150 0 1 1 366 366" fill="none" class="gauge-prog" stroke-width="2.6"/>
+        <!-- major ticks -->
+        <g class="ha-faint" stroke-width="1.4">
+          <line x1="260" y1="118" x2="260" y2="134"/>
+          <line x1="402" y1="260" x2="386" y2="260"/>
+          <line x1="118" y1="260" x2="134" y2="260"/>
+          <line x1="360.6" y1="159.4" x2="349.3" y2="170.7"/>
+          <line x1="159.4" y1="159.4" x2="170.7" y2="170.7"/>
+        </g>
+        <!-- needle (rotated by JS) -->
+        <line id="gaugeNeedle" x1="260" y1="260" x2="154" y2="366" class="ha-accent" stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="260" cy="260" r="7" class="ha-accent-fill"/>
+        <circle cx="260" cy="260" r="13" fill="none" class="ha-accent" stroke-width="1.2" opacity=".5"/>
+        <!-- odometer chrome (box + caption), inside the dial; JS fades it out on dock -->
+        <g id="gaugeChrome">
+          <rect x="196" y="316" width="128" height="34" rx="5" fill="none" class="ha-rule" stroke-width="1.2"/>
+          <text x="260" y="392" text-anchor="middle" class="ha-cap">METERED · PAY-AS-YOU-GO</text>
+        </g>
+      </svg>
+    </div>
+    <!-- readout: overlaid on the dial's odometer box (hero), slides just below when docked -->
+    <span class="gauge__num" id="gaugeNum">000000</span>
+  </aside>
+
+  <main id="top">
+    <!-- ============================ HERO ============================ -->
+    <section class="hero wrap" id="hero">
+      <div class="hero__inner">
+        <p class="meta meta--accent hero__eyebrow reveal">ESP · Edge Settlement Protocol</p>
+        <h1 class="hero__title reveal">Reinventing the ISP</h1>
+        <p class="hero__sub reveal">From Netflix, YouTube and Instagram to general ubiquitous metered Internet.</p>
+        <p class="hero__byline reveal">
+          The Internet's next act — how a neutral federation protocol evolves Internet Service
+          Providers from selling connectivity to clearing Internet service usage, stewarding the
+          data commons, and distributing the applications themselves.
+        </p>
+      </div>
+      <ol class="arc reveal" aria-label="The story in five acts">
+        <li>
+          <a class="arc__step" href="#now">
+            <span class="meta">Now</span>
+            <b>Connectivity companies</b>
+            <span>Capex in, value out. The ISP as a commodity pipe.</span>
+          </a>
+        </li>
+        <li>
+          <a class="arc__step" href="#clearing">
+            <span class="meta">Act I</span>
+            <b>Clearing companies</b>
+            <span>One bill clears every service on the Internet.</span>
+          </a>
+        </li>
+        <li>
+          <a class="arc__step" href="#data">
+            <span class="meta">Act II</span>
+            <b>Data companies</b>
+            <span>A data commons — built without spying.</span>
+          </a>
+        </li>
+        <li>
+          <a class="arc__step" href="#distribution">
+            <span class="meta">Act III</span>
+            <b>App distribution companies</b>
+            <span>Apps run at the ISP, as local franchises.</span>
+          </a>
+        </li>
+        <li>
+          <a class="arc__step arc__step--accent" href="#endgame">
+            <span class="meta meta--accent">Endgame</span>
+            <b>ISP-centric Internet</b>
+            <span>The last mile becomes the Internet’s center of gravity.</span>
+          </a>
+        </li>
+      </ol>
+      <div class="scrollcue reveal" aria-hidden="true"><i></i> Scroll</div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================ ACT I — CONNECTIVITY ============================ -->
+    <section class="section wrap" id="now">
+      <div class="section__head">
+        <p class="meta section__label reveal">Now</p>
+        <h2 class="section__title reveal">ISPs now — connectivity companies</h2>
+      </div>
+      <p class="section__lede reveal">
+        Internet Service Providers laid the subsea cables, pulled the fiber and raised the towers —
+        absorbing the capital risk of building the physical Internet. Yet the outsized returns are
+        captured one layer up, by platforms that own the user relationship and the data it produces.
+      </p>
+      <div class="itemsplit">
+      <div class="items">
+        <div class="item reveal">
+          <div class="item__n">01</div>
+          <div class="item__body">
+            <h3>ISPs built the Internet’s body, but the value is captured above it</h3>
+            <p>The ISP was reduced to a commodity pipe — selling undifferentiated bandwidth at
+            shrinking margins, <strong>structurally excluded from the economics of the very services
+            that traverse its network</strong>. Every stream, every search, every transaction crosses
+            its wires; none of that value stops there.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">02</div>
+          <div class="item__body">
+            <h3>Hyperscalers rule through two moats — captive distribution and hoarded data</h3>
+            <p>Walled gardens own the user relationship end to end, so a small team can’t reach the
+            market without paying the gatekeeper’s toll. And a handful of platforms own the world’s
+            telemetry — <strong>data is users, yet users see none of the value their data
+            creates</strong>. Advertising funds the “free” services, which makes attention the
+            product being sold.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">03</div>
+          <div class="item__body">
+            <h3>DePIN tried to break this with tokens — and proved infrastructure can’t run on speculation</h3>
+            <p>Token-incentivized networks rewarded yield-chasing instead of real demand; when prices
+            crashed, the infrastructure collapsed with them. The overlooked fact: <strong>the
+            Internet already is the most successful decentralized physical infrastructure network in
+            existence</strong>, with the ISP as its building block. What’s missing is not new
+            infrastructure — it’s a neutral protocol to unlock the assets ISPs already own.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+      </div>
+      <aside class="detail reveal" aria-label="In depth">
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 01</p>
+          <div class="detail__prose">
+            <p>The Internet was built twice, by two very different kinds of business. One laid
+            cables under oceans and pulled fiber through streets — slow, regulated work whose costs
+            are recovered over decades. The other wrote software that could reach the whole world
+            from a single datacenter, at a marginal cost near zero. When the two met, the returns
+            flowed to the fast side, and the risk stayed with the slow one.</p>
+            <p>This was not the result of anyone’s malice. The early network was remarkably
+            decentralized, but the products users came to expect — search, recommendations,
+            always-available state — could not be engineered across a loose federation of machines
+            with the tools of the time. Computation drifted into a handful of enormous buildings
+            because that was where those problems could be solved; the data followed the
+            computation, and the network connecting it all became a commodity — necessary,
+            invisible, and paid accordingly.</p>
+            <p>Yet the network operator’s position never actually disappeared. Every interaction,
+            however sophisticated the service behind it, still enters and leaves through the same
+            last mile; the ISP remains the one party present in all of them. What operators lacked
+            for thirty years was not relevance but a way to take part in the value passing through
+            them — one that did not require becoming yet another platform. That missing instrument
+            is what the rest of this story supplies.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 02</p>
+          <div class="detail__prose">
+            <p>The dominance of today’s platforms rests on two advantages that reinforce each other.
+            The first is control of the paths by which software reaches people — the stores, the
+            defaults, the feeds, each taking its share from anyone who needs them. The second is
+            data: a larger audience produces more behavioral signal, which produces a better and
+            better-targeted product, which draws a larger audience still. A newcomer with superior
+            engineering starts behind on both counts, and neither gap can be closed by engineering
+            alone.</p>
+            <p>Advertising is what pays for this machine, and its influence runs deeper than the
+            banners. A service that is free at the point of use must earn its keep from attention,
+            so the product is tuned to capture as much of it as possible — and the surveillance that
+            troubles regulators is not an excess of the model but its bookkeeping, since attention
+            can only be sold if behavior is measured.</p>
+            <p>The least visible cost falls on shared knowledge itself. An index of the web or a map
+            of the world is not an invention; it is a record of what humanity has collectively
+            produced. When such records are owned by companies that finance them through
+            advertising, what they show is shaped by what sells. And everyone who might build
+            something better must first buy access — at the owner’s price, on the owner’s terms —
+            to a picture of their own world.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 03</p>
+          <div class="detail__prose">
+            <p>The first serious attempt to decentralize physical infrastructure came from the
+            crypto world, and its reasoning was straightforward: if people were paid in tokens to
+            run antennas, storage and compute nodes from their homes, a bottom-up alternative to the
+            telecom and cloud incumbents would gradually assemble itself.</p>
+            <p>What assembled instead was a lesson in incentives. The people deploying hardware were
+            there for the token, not the network — so supply grew whenever prices rose and vanished
+            whenever they fell, while real demand never arrived, because no business can depend on
+            infrastructure run by anonymous hobbyists offering no guarantees, no contracts and no
+            one accountable when it fails. Infrastructure, it turned out, cannot be conjured from
+            speculation; it must be carried by entities with real revenues and real obligations.</p>
+            <p>The conclusion usually drawn — that decentralized infrastructure is a dream — misses
+            something obvious. A decentralized physical network of exactly the kind imagined already
+            exists, and has for decades: tens of thousands of independent operators, bound together
+            by common protocols, with paid-for equipment in the ground and billing relationships
+            reaching nearly every household on earth. The Internet itself is proof that the model
+            works. What its operators have never had is the equivalent, at the level of money, of
+            what the Internet’s protocols gave them at the level of data — a neutral standard
+            through which thousands of independent businesses can act as one.</p>
+          </div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================ ACT II — CLEARING ============================ -->
+    <section class="section wrap" id="clearing">
+      <div class="section__head">
+        <p class="meta section__label reveal">Act I</p>
+        <h2 class="section__title reveal">ISPs becoming clearing companies</h2>
+      </div>
+      <p class="section__lede reveal">
+        The Edge Settlement Protocol federates ISPs into a shared metering and clearing layer.
+        Users keep paying the one bill they already pay; applications never invoice, token-gate
+        or collect cards. Every request is metered at the edge and settled automatically from an
+        aggregated clearing pool.
+      </p>
+      <div class="itemsplit">
+      <div class="items">
+        <div class="item reveal">
+          <div class="item__n">01</div>
+          <div class="item__body">
+            <h3>Existing connectivity bill is used to settle all Internet service usage</h3>
+            <p>The connectivity bill becomes a passport to the whole catalog. Like a city
+            multipass covering every gym and pool, users pay a modest blended premium for
+            <strong>commitment-free access to everything they actually touch</strong> — and
+            subscription fatigue disappears.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">02</div>
+          <div class="item__body">
+            <h3>Clearing Internet service usage is a new revenue stream for ISPs</h3>
+            <p>Every metered request clears through the ISP, so the operator finally shares in the
+            economics that used to pass straight over its network. Clearing folds into core
+            operations as a <strong>predictable new revenue line</strong> — earned from the value the
+            network carries, not just the bandwidth it sells.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">03</div>
+          <div class="item__body">
+            <h3>Metered approach to Internet service usage liberates users from subscriptions and advertisements</h3>
+            <p>Because every service settles on the single connectivity bill, users escape the pile
+            of per-app subscriptions — and because usage is paid for directly, the everyday services
+            people rely on no longer need to run on advertising. <strong>One metered relationship
+            replaces both</strong>.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+      </div>
+      <aside class="detail reveal" aria-label="In depth">
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 01</p>
+          <div class="detail__prose">
+            <p>For the household, the change is deliberately invisible. The contract, the support
+            line and the monthly invoice all remain with the same provider; nothing new has to be
+            installed, understood or signed up for. What changes is what the invoice covers: a
+            single recurring payment now settles everything consumed through the connection, and no
+            service ever again asks for a card, a subscription or an account.</p>
+            <p>Underneath, every small act of consumption — a search, a minute of video, a question
+            put to a model — is measured where it happens, at the edge of the network, and recorded
+            as a verifiable event. The providers collectively keep a shared settlement pool funded
+            in advance; as usage is confirmed against it, applications are paid immediately. A
+            builder no longer faces millions of customers who must each be billed, but a single
+            counterparty that always pays.</p>
+            <p>The arrangement is economically sound for the same reason a city pass is. Almost
+            nobody maintains separate memberships at every gym and pool in town, yet many will pay a
+            modest premium for one pass that opens all of them. Blanket access unlocks precisely the
+            consumption that per-service pricing suppresses — the casual visit, the passing
+            curiosity — and because millions of households share one pool, individual fluctuations
+            average out. Usage is metered strictly underneath; what the household experiences is an
+            Internet that simply works, settled by one honest bill.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 02</p>
+          <div class="detail__prose">
+            <p>In every mature market, the party that stands between transacting sides and
+            guarantees settlement is paid for it — card networks, clearing houses and exchanges all
+            live on this role. The Internet has been the exception: an economy of billions of daily
+            transactions running over operators who earn nothing from any of them. Reinvented as
+            clearing companies, ISPs close that anomaly. They front the liquidity from which
+            services are paid, verify the records of usage, absorb the reconciliation and the
+            disputes — and earn from this financial work a revenue stream unrelated to selling
+            bandwidth.</p>
+            <p>Federation is what makes the role valuable. Any single operator’s traffic is a
+            fragment, of little interest to anyone beyond it; thousands of operators clearing
+            through one pool constitute the deepest market on the Internet, and a small share of
+            that market is worth more than complete ownership of a fragment. Joining is rational not
+            despite the sharing, but because of it.</p>
+            <p>The role also carries influence of a kind ISPs have never held. A say in how the
+            system evolves is distributed according to activity actually cleared — not capital, not
+            tokens — so the operators who carry the network’s economy hold a proportionate hand on
+            its rules. After three decades of watching the Internet’s direction being set above
+            their heads, the companies that own its physical body acquire a vote weighted by the
+            work they do.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 03</p>
+          <div class="detail__prose">
+            <p>Everything here rests on how small the unit of payment is: a single query, half a
+            minute of video, one answer from a model. When the unit is this fine, paying follows
+            using exactly — and all the machinery invented to manage coarse payment loses its reason
+            to exist. Plans, tiers, bundles and annual commitments are, at bottom, ways of selling
+            in bulk what could not previously be sold by the piece.</p>
+            <p>The subscription deserves particular scrutiny, because its economics are quietly
+            adversarial: it earns most from the customers who forget it exists, and the doubt it
+            plants — will I use this enough to justify it? — kills more usage than the fee itself.
+            Metered settlement removes the question, and with it the vendor’s stake in the
+            customer’s inertia. It is also more honest in a literal sense: every metered event is
+            visible to the household, itemized and verifiable, where the bundle asks to be
+            trusted.</p>
+            <p>The consequences ripple outward into what gets built at all. A niche service loved by
+            ten thousand people — hopeless under advertising, hopeless behind a paywall — earns a
+            living in an economy that pays per use, so software stops needing a mass audience to
+            deserve existence. And advertising, no longer the only way to fund a free-feeling
+            product, must henceforth defend itself against rivals offering the same thing without
+            it. Nothing bans the ad; what disappears is the absence of an alternative.</p>
+          </div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================ ACT III — DATA ============================ -->
+    <section class="section wrap" id="data">
+      <div class="section__head">
+        <p class="meta section__label reveal">Act II</p>
+        <h2 class="section__title reveal">ISPs becoming data companies — and no, not by spying on traffic</h2>
+      </div>
+      <p class="section__lede reveal">
+        In the legacy web, one company’s crawler reads the web, one company’s cars photograph the
+        streets, and everyone’s behavior is siphoned in secret to sell ads. ESP inverts the model:
+        data is <strong>collected in the open</strong>, aggregated under strict privacy guarantees,
+        and published into a commons no one owns.
+      </p>
+      <div class="itemsplit">
+      <div class="items">
+        <div class="item reveal">
+          <div class="item__n">01</div>
+          <div class="item__body">
+            <h3>ISPs make up the largest, widest data ingest in the world, paving the way for the largest datasets ever created</h3>
+            <p>The modern household is becoming a sensor array: the car films every street it
+            drives, robots map the home, and daily Internet use leaves a behavioral trail. Today
+            that value evaporates — or drains into manufacturers’ silos. The federated ISP is the
+            one <strong>everpresent counterparty positioned to ingest it all</strong> — with
+            consent, on the household’s behalf.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">02</div>
+          <div class="item__body">
+            <h3>Ingested and aggregated data become public commons datasets, not private data silos</h3>
+            <p>What the network ingests doesn’t disappear into a proprietary vault. Anonymized,
+            aggregated datasets are published to an <strong>open commons anyone can build on</strong>
+            — AI pipelines, researchers, competitors — dissolving the private data moat that
+            hyperscalers guard today.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">03</div>
+          <div class="item__body">
+            <h3>Data aggregation work is a new revenue stream for ISPs</h3>
+            <p>Producing and refreshing those datasets is real work — and the protocol pays for it.
+            Buyers fund the collection, not exclusive ownership, so aggregation becomes a
+            <strong>new, recurring revenue line for ISPs</strong> that flows back as a visible
+            discount on the household’s bill.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+      </div>
+      <aside class="detail reveal" aria-label="In depth">
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 01</p>
+          <div class="detail__prose">
+            <p>Households are about to produce more valuable data than most companies do. A car
+            with cameras records the streets it drives through. Every task a household robot
+            performs, from vacuuming today to housework tomorrow, is a recorded example of real
+            physical work — training data that robotics labs currently cannot obtain at any price.
+            Everyday browsing adds a record of what people look
+            for and choose. Even the broadband line itself has a use, since a crawler running from
+            a residential connection sees the ordinary web — the local versions, the pages served
+            to real visitors — that datacenter crawlers get blocked from or shown substitutes for.
+            Almost none of this is collected today, and the part that is collected belongs to
+            whichever manufacturer happened to ship the device.</p>
+            <p>No single company is in a position to gather these streams together. The car maker
+            gets its own cars, the robot vendor its own robots, and even the largest platform sees
+            only what happens inside its own products. An ISP already has a paid relationship with
+            the household, a legal presence in the same country, and a wire into every one of those
+            devices. Thousands of ISPs acting through a common protocol can therefore collect
+            across all of it, and can do it in the open: data is gathered when a buyer commissions
+            it, each operator handles only its own subscribers, personal detail is removed before
+            anything is published, and the household gets a share back via its regular monthly
+            bill. Whether the car’s cameras contribute at all, and to which network,
+            stays the owner’s decision rather than the manufacturer’s.</p>
+            <p>What comes out is hard to obtain by any other means: street imagery refreshed by
+            daily commutes, manipulation data from household robots at population scale, a
+            continuously updated index of the web, behavioral aggregates covering entire countries.
+            Building any one of these requires being present in millions of homes at once, and that
+            is the position ISPs already occupy.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 02</p>
+          <div class="detail__prose">
+            <p>The defining rule of the data market is that the buyer never takes possession of the
+            data. A purchase funds a round of collection, and the output — anonymized and
+            aggregated until no individual can be recovered — is published openly for anyone to
+            read. What a buyer pays for is the data existing and being current: the slice it needs
+            is often missing or stale until someone funds its collection. Rivals reading the same
+            dataset afterward takes nothing away from that, and a commissioned refresh still costs
+            far less than running a private collection network — the only other way to get the
+            data at all.</p>
+            <p>Because the dataset is open and excludes no one, no single buyer has to fund all of
+            it. Different organizations pay to refresh the parts they care about — a logistics firm
+            keeping road and street imagery current, a retailer funding collection of shopping
+            behavior, a government improving coverage of its own region, an AI lab commissioning
+            whatever it needs to train on. Each request is placed
+            through the same protocol and fulfilled by the same collector — the federated ISP
+            collective — and every result accumulates in the same dataset. Each funder therefore
+            improves the data for everyone else as a byproduct of serving itself, and the cost of
+            keeping the commons fresh is spread across many parties with unrelated interests rather
+            than resting on any single one.</p>
+            <p>Once these datasets are open to everyone, holding data stops being an advantage in
+            itself, and the contest moves to what gets built on top of them. The record itself —
+            what the web contains, what the streets look like — also stops being kept by companies
+            whose revenue depends on which version of it people are shown.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 03</p>
+          <div class="detail__prose">
+            <p>Maintaining the commons is real work — collection has to run, anonymization has to
+            hold, quality has to be checked, storage has to be paid for — and the system treats it
+            as work rather than charity. Every commissioned refresh routes payment to the operators
+            who performed it, and because demand for fresh data never ends, the income arrives not
+            as a windfall but as a recurring line of business: the second revenue stream the ISP
+            acquires in this story.</p>
+            <p>Part of that stream flows onward to the households whose activity, in aggregate, made
+            the data worth anything. Here the design bows to human nature. People will not run
+            wallets to collect cents; the worth of any one person’s signal is genuinely small, and
+            paying it out directly feels like a chore dressed up as an opportunity. Folded instead
+            into the bill that already exists — as a visible discount, applied automatically, for
+            everyone — the same money becomes something a household actually notices. The operator
+            does the harvesting; the subscriber simply pays less.</p>
+            <p>In the aggregate, this is the revenue that replaces advertising as the patron of the
+            everyday Internet. Search, mail, news and video have always been paid for by something.
+            Financed from data and computation sold openly, rather than attention sold covertly, the
+            free tier survives with its incentives repaired: the services need their users
+            satisfied, not captivated.</p>
+          </div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================ ACT IV — DISTRIBUTION ============================ -->
+    <section class="section wrap" id="distribution">
+      <div class="section__head">
+        <p class="meta section__label reveal">Act III</p>
+        <h2 class="section__title reveal">ISPs becoming app distribution companies</h2>
+      </div>
+      <p class="section__lede reveal">
+        In the ESP model an application is a deployable package. Founders build the product;
+        ISPs and their datacenters run it as <strong>local franchises</strong>, close to their own
+        subscribers. The protocol splits every cleared payment automatically — operational revenue
+        to the operator, royalty to the founder.
+      </p>
+      <div class="itemsplit">
+      <div class="items">
+        <div class="item reveal">
+          <div class="item__n">01</div>
+          <div class="item__body">
+            <h3>New kind of apps break the old trade-off between convenience and control</h3>
+            <p>These apps feel as fast and polished as anything the big platforms offer — yet
+            nothing is taken in exchange. Your data stays <strong>under your control and
+            portable</strong>: no signup walls, no forced ads, and nothing that ties you to a single
+            provider. And the apps are <strong>natively jurisdiction-aware</strong> — each user is
+            served by a legally accountable operator in their own country, under their own laws,
+            without forking the product.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">02</div>
+          <div class="item__body">
+            <h3>Small founder teams win — distribution, billing and compliance come with the network</h3>
+            <p>Freed from the operational overhead, a compact team reaches millions and
+            <strong>competes on product quality alone</strong> — operators everywhere deploy, market
+            and support its app. Alongside the founders a new class of entity emerges: local Site
+            Operators who run catalogues of apps, specialize in finance, media or AI, and carry the
+            legal weight in each jurisdiction.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">03</div>
+          <div class="item__body">
+            <h3>Monetizing routing decisions is a new revenue stream for ISPs</h3>
+            <p>Because the ISP controls the routing tables, it decides which site serves each request.
+            It can host the app on-net to capture the <strong>full operational revenue</strong>, or
+            steer that traffic to partners who pay for the feed. Distribution itself becomes a line of
+            revenue, not just a cost.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+      </div>
+      <aside class="detail reveal" aria-label="In depth">
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 01</p>
+          <div class="detail__prose">
+            <p>Decentralized software has historically asked its users for a sacrifice. Systems that
+            pushed every action through global consensus were slower, clumsier and poorer than their
+            centralized rivals by construction — and no principle survives a ten-second wait to post
+            a message. For open architectures to win, they had to stop being a compromise.</p>
+            <p>The resolution is a division of labor. Only what genuinely requires incorruptibility —
+            money, settlement, ownership — touches the shared ledger. The applications themselves
+            run in real datacenters with everything co-located and tuned, exactly as the incumbents
+            run theirs, so nothing in the experience betrays the architecture beneath. The
+            difference is confined to who holds what: the user’s data lives in storage the user
+            controls, replicated close to the application for speed, readable to it but never
+            absorbed by it. Walking away means pointing that data at a different provider — not
+            reconstructing a digital life from scratch.</p>
+            <p>Law is treated with the same seriousness as latency. Each user is served from a site
+            operated by an accountable company in their own country, under their own rules; whatever
+            must differ between countries is configured locally rather than forked from the product.
+            The result reverses the terms the platform era imposed: software that feels global and
+            answers locally, convenience without captivity — and nothing holding the user in place
+            except the product continuing to deserve them.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 02</p>
+          <div class="detail__prose">
+            <p>What has always been scarce for a founding team is not the ability to build software
+            but everything surrounding it: reaching users, charging them, satisfying a hundred
+            regulators, staffing support at three in the morning. This model lifts all of it off the
+            builder’s desk. The creators’ claim on their work is written into the settlement layer
+            itself — a share of every paid interaction, anywhere on earth, flows to them
+            automatically — which means the code can be given away freely without giving away the
+            living it earns.</p>
+            <p>The operations land with those equipped to carry them. Local operators deploy the
+            application in their own datacenters, answer to their own regulators, staff their own
+            support — and because they earn from every unit of usage they serve, they promote the
+            product to their subscribers as energetically as a franchisee promotes a brand. A
+            handful of engineers thereby inherits, without hiring anyone, the sales force and
+            operations of a multinational.</p>
+            <p>Even the financing bends to the same logic. A team can raise money against the usage
+            its product will one day generate, repay it automatically from revenue as it arrives,
+            and emerge unencumbered once the agreed cap is reached — no board seats surrendered, no
+            permanent tax on the product’s future. What disciplines the whole arrangement is the
+            absence of walls: builders who neglect their work can be replaced, and builders who keep
+            deserving their share keep receiving it. Usefulness, continuously renewed, is the only
+            tenure.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 03</p>
+          <div class="detail__prose">
+            <p>Applications in this environment are reached through addresses that many datacenters
+            announce at once, leaving the network to decide which one answers each request. That
+            decision belongs to the ISP, which controls the routes its subscribers’ traffic takes —
+            and here the decision carries money, because whoever serves the request earns the
+            revenue for operating it.</p>
+            <p>Both available choices pay. An operator that hosts an application locally keeps the
+            full operating income, serves its subscribers at the lowest possible latency, and never
+            pays to carry the traffic elsewhere. An operator that would rather not run a particular
+            service still holds something of value — the demand itself — and can direct it to
+            partners on agreed terms. Between hosting and steering there is no neutral setting in
+            which the position earns nothing; the operator chooses only in which currency to be
+            paid.</p>
+            <p>Practiced at scale, this becomes a business of portfolio judgment. Capable operators
+            run catalogues of applications on one shared pool of machines, shifting capacity toward
+            whatever is busy tonight and renting the idle remainder out for background work; over
+            time they specialize around their strengths — one excelling at regulated financial
+            services, another at media, a third at machine-learning workloads on its accelerator
+            fleet. Distribution, a function ISPs have performed unpaid since the network began,
+            matures into their third business — and the one that feeds the other two.</p>
+          </div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================ ACT V — ENDGAME ============================ -->
+    <section class="section wrap" id="endgame">
+      <div class="section__head">
+        <p class="meta section__label reveal">Endgame</p>
+        <h2 class="section__title reveal">ISP-centric Internet</h2>
+      </div>
+      <p class="section__lede reveal">
+        Thousands of federated providers — not one platform — hold the Internet’s liquidity, its
+        data commons and its distribution. Together they form an economic force with
+        <strong>stronger network effects than any hyperscaler</strong>, and metered pay-as-you-go
+        becomes the default business model of the Internet.
+      </p>
+      <div class="itemsplit">
+      <div class="items">
+        <div class="item reveal">
+          <div class="item__n">01</div>
+          <div class="item__body">
+            <h3>Hypercentralization ends — applications can no longer build moats, only better products</h3>
+            <p>Every Internet giant was built on the same two moats: captive distribution and hoarded
+            data. In the endgame neither can be meaningfully built, because the federation always
+            holds more of both — no platform can out-distribute a network that owns the last mile to
+            every user, and no private silo can out-collect a commons aggregated across all of them
+            and open to everyone. What remains is <strong>competition on merit</strong>: product
+            quality, service quality, price. Positions stop being defensible by structure and must be
+            re-earned in use — Metcalfe’s law stops minting monopolies and goes back to work for the
+            network itself.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">02</div>
+          <div class="item__body">
+            <h3>Economic activity in both directions feeds a neutral wealth fund — a moat no company can cross</h3>
+            <p>The fund is fed from both sides — households’ bills and buyers of data and compute
+            flow in; per-use payouts to builders and discounts back to households flow out. That
+            circulation makes it less a treasury than a monetary system: the place where the
+            Internet’s economy clears. It decouples the price of access from the cost of service,
+            funds the everyday “free” Internet honestly, and gives the long tail of software a
+            stable income no ad market would ever grant it. And it cannot be out-competed, because
+            <strong>neutrality is the one thing a company cannot copy</strong> — a private replica
+            of the fund is just another walled garden, and walled gardens repel the very flows that
+            make the pool deep. Like a reserve currency, it wins not because anyone defends it, but
+            because everyone’s economics come to be denominated in it. To beat it you would have to
+            out-pool the planet; to out-pool the planet you would have to be neutral — that is,
+            become it.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+        <div class="item reveal">
+          <div class="item__n">03</div>
+          <div class="item__body">
+            <h3>Jurisdiction-native decentralization — decentralization that faces the law instead of fleeing it</h3>
+            <p>The old Internet was structurally offshore: global platforms served every country from
+            nowhere, and enforcing local law against them meant a decade in court, if it was possible
+            at all. ESP makes jurisdiction a protocol primitive — <strong>settlement clears only
+            between parties matched in the same jurisdiction</strong>. A German user is served under
+            German law by a locally accountable operator; compliance stops being fuzzy risk
+            management and becomes a binary, deterministic state. Nation-states regain real oversight
+            of their digital economies — a law passed at home is enforced by the network itself,
+            because breaking it severs revenue rather than triggering a lawsuit. Jurisdictional
+            arbitrage stops being a business model, and the digital economy contributes to the
+            society it operates in instead of extracting value to havens.</p>
+            <span class="item__more">In depth</span>
+          </div>
+        </div>
+      </div>
+      <aside class="detail reveal" aria-label="In depth">
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 01</p>
+          <div class="detail__prose">
+            <p>Every dominant platform of the last generation was constructed from the same three
+            materials: control of the route to users, custody of their identities, and exclusive
+            accumulation of the data their activity produced. The products and brands were the
+            visible surface; those three holdings were the load-bearing structure. The end state
+            described here is simply the condition in which none of the three can be held any
+            longer.</p>
+            <p>The route to users belongs to the federated network and is priced the same for
+            everyone. Identity stays where it naturally lives — with the provider a household
+            already knows — which vouches for its subscribers toward services without handing over
+            who they are; no application accumulates accounts, because none needs them. And data,
+            flowing into open aggregates that anyone may use, can no longer be hoarded into an
+            advantage: whatever one company learns from the commons, its competitor can learn as
+            well. The raw materials of monopoly are still produced, more abundantly than ever; they
+            simply no longer accumulate anywhere private.</p>
+            <p>A market stripped of these instruments has one axis left, and it is the one users
+            always wanted: quality. A service that decays or turns against its users can be walked
+            away from, data in hand, and every operator has reasons to make the walking easy —
+            though never free, so that building well still compounds. Scale still matters and
+            networks still concentrate; what they now concentrate is the shared fabric itself,
+            which belongs to no one and therefore threatens no one.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 02</p>
+          <div class="detail__prose">
+            <p>At the center of this economy sits a single shared fund, and everything passes
+            through it in both directions. Households’ payments flow in, alongside the money paid by
+            buyers of data and computation; payments to applications flow out as usage settles, and
+            discounts flow back to households. It is less a treasury than a circulation — the point
+            at which the Internet’s economy clears — and its reserves blend every kind of revenue
+            the network produces.</p>
+            <p>The blending is what gives it power. Because connectivity fees, service usage, data
+            income and compute income mingle in one pool, no service has to be priced by its own
+            costs alone: the heavy user of one thing is carried by the light user of another,
+            expensive months are absorbed by quiet ones, and the everyday services that anchor the
+            Internet can be offered generously while strict metering runs invisibly below. It is the
+            mechanism of an insurance pool, applied to an entire economy.</p>
+            <p>What protects the fund is not its size but its constitution. Any imitation built by a
+            company would have an owner, and an owner is exactly what such a pool cannot survive —
+            no operator will pour its subscribers’ economics into a rival’s coffers. Depth comes
+            only from a neutrality that no company can offer, which is why the fund cannot be
+            competed with, only joined. A position held that way needs no defending; it is simply
+            final.</p>
+          </div>
+        </div>
+        <div class="detail__pane">
+          <p class="meta meta--accent">In depth · 03</p>
+          <div class="detail__prose">
+            <p>The legal signature of the platform era was placelessness. A service could be
+            consumed in one country, operated from a second, incorporated in a third and taxed — if
+            at all — in a fourth; every attempt to govern it slid off toward some other
+            jurisdiction. This was not a failure of regulators but a property of the architecture:
+            where the money and the operation can always move, the law can only ever chase.</p>
+            <p>The new arrangement removes the escape rather than sharpening the pursuit. Settlement
+            is possible only between parties under the same law: whoever serves a user must be a
+            company established where that user lives, and where that condition fails, the payment
+            simply never clears. Obligations that once required treaties to enforce — consumer
+            protection, taxation, lawful process — now attach automatically to someone within
+            reach. And the operators gain as much as they concede: a local company serving local
+            customers under familiar law is a far safer thing to be than a link in an unaccountable
+            global chain.</p>
+            <p>For governments, this restores authority without expanding surveillance: rules made
+            at home bind the companies at home, and breaking them interrupts revenue directly — a
+            consequence measured in days rather than in decades of litigation. For the Internet as a
+            whole, it ends the era in which regulatory escape was a business model. What is earned
+            in a society settles there, is taxed there, and helps carry the society it came from.</p>
+          </div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================ CTA ============================ -->
+    <section class="cta wrap" id="whitepaper">
+      <p class="meta reveal">Request for Comments · Revision 0.1</p>
+      <h2 class="cta__title reveal">Read <em>Reinventing the ISP</em></h2>
+      <p class="cta__lede reveal">
+        The full whitepaper covers the ESP economy, protocol architecture, the game theory of
+        federation, and the blueprint for a next-generation, ISP-centric Internet.
+      </p>
+      <a class="link-lg reveal" href="#top">Get the whitepaper <span aria-hidden="true">→</span></a>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="footer wrap">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <b>Open<span class="brand__dim">Edge</span></b>
+        <p>From commodity pipe to the center of the Internet.</p>
+      </div>
+      <nav class="footer__nav" aria-label="Footer">
+        <a href="#now">Now</a>
+        <a href="#clearing">Clearing</a>
+        <a href="#data">Data</a>
+        <a href="#distribution">Distribution</a>
+        <a href="#endgame">Endgame</a>
+        <a href="#whitepaper">Whitepaper</a>
+      </nav>
+      <div class="footer__meta">
+        <p>Public record powered by Celestia</p>
+        <p>© <span id="year">2026</span> Open Edge · ESP</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js?v=8" defer></script>
+</body>
+</html>
