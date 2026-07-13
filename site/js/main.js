@@ -73,7 +73,8 @@
       // centre the dial on the hero subtitle line (fallback: viewport centre)
       var heroTop = heroSub ? absCenterY(heroSub) - gw / 2 : (vh - gw) / 2 + Math.min(16, vh * 0.02);
       HERO = { top: heroTop, right: rightInset, w: gw, num: 18, numTop: 0.64 };
-      CORNER = { top: 74, right: 24, w: 98, num: 13, numTop: 1.12 };
+      // docked into the header band (nav is 60px tall): small dial, readout below
+      CORNER = { top: 4, right: 22, w: 40, num: 11, numTop: 1.15 };
       DOCK = vh * 0.72;
     }
   }
