@@ -162,7 +162,9 @@ strong { font-weight: 600; }
 
 /* ============================ SECTIONS ============================ */
 .rule { border: none; border-top: 1px solid var(--rule); margin: 0; }
-.section { padding: clamp(70px, 11vh, 140px) 0; }
+/* padding-block only: the horizontal padding comes from .wrap (a `padding:
+   X 0` shorthand here would zero it out and pin sections to the viewport edge) */
+.section { padding-block: clamp(70px, 11vh, 140px); }
 .section__head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
 .section__label { margin-bottom: 30px; }
 .section__title { font-size: clamp(1.9rem, 4.6vw, 3.4rem); font-weight: 600; max-width: 20ch; letter-spacing: -.02em; }
@@ -237,7 +239,7 @@ strong { font-weight: 600; }
 .itemsplit .item:hover .item__more::after { transform: translateX(5px); }
 .itemsplit .item.is-active .item__more { color: var(--faint); }
 .itemsplit .item.is-active .item__more::after { content: "· shown"; transform: none; }
-@media (max-width: 900px) { .item__more { display: none; } }
+.item__inline { display: none; } /* narrow-screen inline article (JS-filled) */
 .detail { position: sticky; top: 92px; margin-top: 38px; border-left: 2px solid transparent; padding-left: clamp(18px, 2.5vw, 30px); }
 .detail:has(.detail__pane.is-active) { border-left-color: var(--accent); }
 .detail__pane { display: none; }
@@ -248,13 +250,21 @@ strong { font-weight: 600; }
 .detail__prose p + p { margin-top: .9em; }
 @media (max-width: 900px) {
   .itemsplit { grid-template-columns: 1fr; }
-  /* Sticky right-hand pane can't work in a single column; hide it until a
-     point is opened (tap or deep link), then show it inline below the list. */
-  .detail { display: none; position: static; top: auto; margin-top: 24px; }
-  .detail:has(.detail__pane.is-active) { display: block; }
-  .detail__pane { scroll-margin-top: 84px; }
+  /* Single column: the side pane disappears entirely; tapping an item swaps
+     its summary for the in-depth article in place (.item__inline, JS-filled),
+     tapping again swaps back. */
+  .detail { display: none; }
+  .item__more { display: inline-block; } /* tap affordance */
+  .item.is-open .item__more { display: none; }
+  .item.is-open .item__body > p { display: none; }
+  .item.is-open .item__inline { display: block; animation: dfade .35s var(--ease); }
+  .item__inline > .meta { display: block; margin: 14px 0; }
+  .item__close {
+    display: inline-block; margin-top: 18px; font-family: var(--mono); font-size: .66rem;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+  }
 }
-@media (prefers-reduced-motion: reduce) { .detail__pane.is-active { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .detail__pane.is-active, .item.is-open .item__inline { animation: none; } }
 
 /* ---- story arc strip (five acts) ---- */
 .arc { list-style: none; margin: 48px 0 0; padding: 0; display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px 0; }

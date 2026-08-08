@@ -144,6 +144,34 @@
   var deepLinks = {};
   var prefersReduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Narrow screens: the sticky side pane has no place in a single column, so
+  // the in-depth text opens inline, inside the tapped item (summary swaps to
+  // article; tapping again swaps back). One item open at a time.
+  var narrowMq = window.matchMedia ? window.matchMedia("(max-width: 900px)") : null;
+  function isNarrow() { return !!(narrowMq && narrowMq.matches); }
+  var inlineOpen = null; // the .item currently expanded on narrow screens
+
+  function openInline(item, pane) {
+    if (inlineOpen && inlineOpen !== item) { inlineOpen.classList.remove("is-open"); }
+    var box = item.querySelector(".item__inline");
+    if (!box && pane) {
+      box = document.createElement("div");
+      box.className = "item__inline";
+      box.innerHTML = pane.innerHTML;
+      var close = document.createElement("span");
+      close.className = "item__close";
+      close.textContent = "Close ↑";
+      box.appendChild(close);
+      item.querySelector(".item__body").appendChild(box);
+    }
+    item.classList.add("is-open");
+    inlineOpen = item;
+  }
+  function closeInline(item) {
+    item.classList.remove("is-open");
+    if (inlineOpen === item) { inlineOpen = null; }
+  }
+
   Array.prototype.forEach.call(document.querySelectorAll(".itemsplit"), function (split) {
     var items = Array.prototype.slice.call(split.querySelectorAll(".items > .item"));
     var panes = Array.prototype.slice.call(split.querySelectorAll(".detail__pane"));
@@ -160,7 +188,20 @@
     items.forEach(function (el, i) {
       var id = prefix ? prefix + "-0" + (i + 1) : null;
       if (id) { el.id = id; }
-      el.addEventListener("click", function () {
+      el.addEventListener("click", function (ev) {
+        if (ev.target && ev.target.closest && ev.target.closest("a")) { return; }
+        if (isNarrow()) {
+          if (el.classList.contains("is-open")) {
+            closeInline(el);
+            el.scrollIntoView({ behavior: prefersReduce ? "auto" : "smooth", block: "nearest" });
+          } else {
+            openInline(el, panes[i]);
+            if (id && window.history && history.replaceState) {
+              history.replaceState(null, "", "#" + id);
+            }
+          }
+          return;
+        }
         activate(i);
         if (id && window.history && history.replaceState) {
           history.replaceState(null, "", "#" + id);
@@ -171,14 +212,11 @@
           // Force-reveal in case scroll-reveal hasn't fired for this block yet.
           items.forEach(function (s) { s.classList.add("is-in"); });
           if (aside) { aside.classList.add("is-in"); }
-          activate(i);
+          // Narrow screens: open the in-depth text inline in the item itself;
+          // desktop: light up the sticky pane alongside.
+          if (isNarrow()) { openInline(el, panes[i]); } else { activate(i); }
           if (doScroll) {
-            // Desktop: scroll to the point (its pane is sticky alongside).
-            // Narrow screens: the pane renders inline below the list, so land
-            // directly on the in-depth text itself.
-            var narrow = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
-            var target = (narrow && panes[i]) ? panes[i] : el;
-            target.scrollIntoView({ behavior: (smooth && !prefersReduce) ? "smooth" : "auto", block: "start" });
+            el.scrollIntoView({ behavior: (smooth && !prefersReduce) ? "smooth" : "auto", block: "start" });
           }
         };
       }
