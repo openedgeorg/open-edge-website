@@ -330,6 +330,27 @@ a.arc__step:hover { border-color: var(--accent); background: var(--bg-2); }
   .principles { columns: 1; }
   .footer__meta { text-align: left; }
 }
+/* below the JS mobile breakpoint (760): toggle right-aligned, the gauge
+   (JS-positioned, right: 64) docks just left of it in the header band */
+@media (max-width: 759px) {
+  .theme-toggle { margin-left: auto; }
+  /* tighter hero rhythm, and a hero short enough (svh = visible viewport,
+     unlike vh which hides behind the URL bar) that the next section's top
+     edge peeks above the fold as a scroll cue */
+  .hero { min-height: 86vh; min-height: 86svh; padding-top: 84px; padding-bottom: 48px; }
+  .hero__eyebrow { margin-bottom: 18px; }
+  .hero__sub { margin-top: 16px; }
+  .hero__byline { margin-top: 20px; }
+  .hero__foot { margin-top: 24px; }
+  /* denser act strip (mirrors the compressed one-row desktop variant) so the
+     five stacked cards don't dominate the scroll */
+  .hero .arc { padding-top: 28px; }
+  .arc__step { padding: 13px 14px 11px; }
+  .arc__step .meta { margin-bottom: 6px; }
+  .arc__step b { font-size: 1.02rem; }
+  .arc__step span { font-size: .88rem; }
+  .arc li:not(:last-child)::after { margin: 8px 0; }
+}
 @media (max-width: 560px) {
   .item { grid-template-columns: 1fr; gap: 10px; }
   .item__n { padding-top: 0; }

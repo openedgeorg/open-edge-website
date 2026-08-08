@@ -60,11 +60,11 @@
     var vw = window.innerWidth, vh = window.innerHeight;
     isMobile = vw < 760;
     if (isMobile) {
-      // small screens: start as a compact counter under the nav, then dock
-      // into the header band itself (nav is 60px tall), same as desktop —
-      // parked below the nav it sits on top of the page content
-      HERO = { top: 62, right: 14, w: 84, num: 12, numTop: 1.16 };
-      CORNER = { top: 5, right: 14, w: 40, num: 10, numTop: 1.15 };
+      // small screens: no hero theater — the gauge lives in the header band
+      // (nav is 60px tall) from the start, docked left of the right-aligned
+      // theme toggle; only its metered value animates with scroll
+      HERO = { top: 5, right: 64, w: 40, num: 10, numTop: 1.15 };
+      CORNER = HERO;
       DOCK = vh * 0.5;
     } else {
       // gauge dial centred (a touch below middle) to sit at the image's eye-level
