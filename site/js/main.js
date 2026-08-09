@@ -61,9 +61,9 @@
     isMobile = vw < 760;
     if (isMobile) {
       // small screens: no hero theater — the gauge lives in the header band
-      // (nav is 60px tall) from the start, docked left of the right-aligned
-      // theme toggle; only its metered value animates with scroll
-      HERO = { top: 5, right: 64, w: 40, num: 10, numTop: 1.15 };
+      // (nav is 60px tall) from the start, in the far right corner with the
+      // theme toggle to its left; only its metered value animates with scroll
+      HERO = { top: 5, right: 14, w: 40, num: 10, numTop: 1.15 };
       CORNER = HERO;
       DOCK = vh * 0.5;
     } else {

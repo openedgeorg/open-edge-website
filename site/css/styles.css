@@ -343,7 +343,9 @@ a.arc__step:hover { border-color: var(--accent); background: var(--bg-2); }
 /* below the JS mobile breakpoint (760): toggle right-aligned, the gauge
    (JS-positioned, right: 64) docks just left of it in the header band */
 @media (max-width: 759px) {
-  .theme-toggle { margin-left: auto; }
+  /* toggle right-aligned but held clear of the gauge, which sits in the far
+     corner (JS-positioned at right: 14, 40px wide) */
+  .theme-toggle { margin-left: auto; margin-right: 44px; }
   /* tighter hero rhythm, and a hero short enough (svh = visible viewport,
      unlike vh which hides behind the URL bar) that the next section's top
      edge peeks above the fold as a scroll cue */
