@@ -189,66 +189,66 @@
         <div class="detail__pane">
           <p class="meta meta--accent">In depth · 01</p>
           <div class="detail__prose">
-            <p>The early Internet was engineered as a federation of peers. Its founding protocols
-            carried mail and pages between independent machines and kept no state of their own,
-            and for a while the network’s shape matched its architecture. The workload then
-            changed: users came to expect persistent accounts, instant search and algorithmic
-            curation, and coordinating that much state across a loose, heterogeneous network was
-            beyond the computer science of the day. Routing everything through central
-            computational hubs was the pragmatic answer, and those hubs grew into today’s
-            hyperscale datacenters.</p>
-            <p>The compromise sorted the industry into roles. Data and computation concentrated
-            where they could be managed, monetization followed the data, and the network beneath
-            was repriced as commodity transit. The risk ran the other way: ISPs committed the
-            heavy capital, subsea cables, terrestrial fiber and cellular towers recovered over
-            decades, while the application layer collected the returns on infrastructure it did
-            not hold.</p>
-            <p>None of this was conspiracy; it was the efficient response to a real constraint.
-            The arrangement has simply outlived the constraint that justified it.</p>
+            <p>The founding protocols of the Internet were stateless and peer-to-peer by design.
+            SMTP and HTTP moved mail and pages between independent machines and kept no record
+            of their own, and the network’s early shape matched its architecture. The workload
+            then changed. Users came to expect persistent accounts, real-time search and
+            algorithmically curated feeds, and each of these requires state: data that must be
+            stored somewhere physical, kept consistent, and queried at interactive speed.</p>
+            <p>During the formative years of the web, coordinating that much state across a
+            loose, heterogeneous network was an intractable computer science problem. Storing
+            and processing it in one place was not. Data gravitates to where it is stored,
+            computation gravitates to the data, and monetization follows both. Routing traffic
+            through central computational hubs, where aggregation, indexing and curation could
+            be executed efficiently, was the most efficient design available, and the hubs built
+            for it grew into today’s hyperscale datacenters.</p>
+            <p>None of this was monopolistic intent; centralization won because it worked, and
+            for two decades it was the correct engineering answer. Its side effect was
+            structural: the industry’s roles were assigned, with services and their economics
+            concentrating in the hubs while the network beneath was left to carry traffic.</p>
           </div>
         </div>
         <div class="detail__pane">
           <p class="meta meta--accent">In depth · 02</p>
           <div class="detail__prose">
-            <p>Online services address the entire globe from a single point, which gives
-            Metcalfe’s law an unusually long lever: every additional user makes the service more
-            valuable to the rest, and value compounds toward whoever already holds the audience.
-            What the winners end up holding is concrete. The first asset is the direct
-            relationship with the user; the second is the proprietary silo of data that usage
-            leaves behind. Advertising and subscriptions are both monetizations of these two
-            assets, and a challenger must overcome both before product quality enters the contest
-            at all.</p>
-            <p>The financing shapes the products. A service free at the point of use earns from
-            attention, so it is built to capture attention, and it measures behavior because
-            measured behavior is what advertisers buy.</p>
-            <p>The structural oddity of this economy is who goes unrepresented in it. Users are
-            the largest group of actors on the Internet and the weakest: fragmented, unorganized,
-            and ineffective at bargaining for their own good. Every institution with real weight
-            in the system is paid to serve someone else. No economically motivated institution
-            stands on the user’s side of the table.</p>
+            <p>Internet Service Providers are the only universal counterparties on the Internet:
+            every online interaction, whatever its application or origin, passes through the
+            network of the user’s ISP. No other class of actor holds this position. It rests on
+            physical facts, wires into households, spectrum and cable landings, and on a direct,
+            recurring billing relationship with nearly every connected household and business.</p>
+            <p>The economics of the position do not match its structure. ISPs financed the
+            physical Internet: subsea cables, terrestrial fiber and cellular towers, capital
+            committed up front and recovered over decades. The services running over this
+            infrastructure settle their economics elsewhere, while connectivity itself is sold
+            as undifferentiated transit, compared and bought on bandwidth and price. An ISP can
+            invest, consolidate or discount, but within the current arrangement it cannot
+            participate in the value of the traffic it carries.</p>
+            <p>The exclusion is historically understandable. Participating in service economics
+            has so far meant becoming a platform: operating services, holding user data,
+            competing with one’s own customers. ISPs lacked a neutral mechanism for taking part
+            without abandoning their role as carriers. The position, the physics and the billing
+            relationship remain in place; what has been missing is the instrument.</p>
           </div>
         </div>
         <div class="detail__pane">
           <p class="meta meta--accent">In depth · 03</p>
           <div class="detail__prose">
-            <p>Two shifts distinguish the present moment. The technical constraint behind
-            centralization has lifted: applied cryptography, distributed consensus, data
-            replication, zero-knowledge proofs and edge computing now support global applications
-            that are distributed by construction and competitive in experience. At the same time
-            AI is commoditizing software itself. With the cost of producing features, interfaces
-            and business logic trending toward zero, the traditional software moats evaporate,
-            and durable advantage contracts to physics, ownership and policy: infrastructure that
-            exists in the world, assets and relationships that are owned, and the rules under
-            which service is rendered. These are the holdings of ISPs.</p>
-            <p>The token experiments of recent years tested the opposite route and settled the
-            question. Paying individuals in tokens to run antennas and nodes attracted supply
-            chasing yield rather than demand; when prices fell the hardware left, and no business
-            will depend on hobbyist infrastructure offering no contracts and no accountability.
-            Infrastructure runs on utility and stable exchange, not speculation.</p>
-            <p>The Internet itself remains the largest working decentralized physical network in
-            existence, operated by tens of thousands of ISPs with deployed assets, recurring
-            revenues and a wire into nearly every household. They need no token to bootstrap what
-            is already built, only a neutral standard through which to act as one economy.</p>
+            <p>Two monetization models finance effectively every consumer service on the
+            Internet. Advertising sells the user’s attention: the service is free at the point
+            of use, earns per impression, and is therefore engineered to maximize engagement and
+            to measure behavior, because measured behavior is what advertisers buy.
+            Subscriptions sell commitment: a flat recurring fee that recovers its cost only from
+            users whose consumption is regular enough to clear the price.</p>
+            <p>A large share of real demand falls outside both boundaries. Households already
+            carrying several subscriptions refuse another commitment at any price. Others never
+            subscribe at all. The occasional user, one match, one film, one query a month, sits
+            below every subscription’s break-even and is invisible to the model. Per-use payment
+            does not rescue these cases: attaching a checkout to each interaction triggers the
+            pain of paying and loss aversion, and the interaction simply does not happen.</p>
+            <p>The result is a market that undercounts its own demand. Usage with genuine value
+            to both sides is booked at zero because no mechanism exists to charge for it, and
+            services optimize for the two constituencies they can bill, heavy users and
+            advertisers, rather than for use itself.</p>
           </div>
         </div>
       </aside>
